@@ -11,7 +11,7 @@ import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
 
-	"github.com/glebarez/sqlite"
+	_ "github.com/glebarez/sqlite"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -137,15 +137,9 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, error) {
 			})
 		}
 		if strings.HasPrefix(dsn, "local") {
-			common.SysLog("SQL_DSN not set, using SQLite as database")
-			if !isLog {
-				common.UsingSQLite = true
-			} else {
-				common.LogSqlType = common.DatabaseTypeSQLite
-			}
-			return gorm.Open(sqlite.Open(common.SQLitePath), &gorm.Config{
-				PrepareStmt: true, // precompile SQL
-			})
+			// Default to MySQL with local connection
+			dsn = "root:123456@tcp(127.0.0.1:3306)/new-api?parseTime=true"
+			common.SysLog("SQL_DSN set to local, defaulting to MySQL")
 		}
 		// Use MySQL
 		common.SysLog("using MySQL as database")
@@ -166,10 +160,11 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, error) {
 			PrepareStmt: true, // precompile SQL
 		})
 	}
-	// Use SQLite
-	common.SysLog("SQL_DSN not set, using SQLite as database")
-	common.UsingSQLite = true
-	return gorm.Open(sqlite.Open(common.SQLitePath), &gorm.Config{
+	// Default to MySQL if no DSN provided
+	dsn = "root:123456@tcp(127.0.0.1:3306)/new-api?parseTime=true"
+	common.SysLog("SQL_DSN not set, defaulting to MySQL database")
+	common.UsingMySQL = true
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{
 		PrepareStmt: true, // precompile SQL
 	})
 }
