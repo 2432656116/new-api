@@ -138,7 +138,7 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, error) {
 		}
 		if strings.HasPrefix(dsn, "local") {
 			// Default to MySQL with local connection
-			dsn = "root:123456@tcp(127.0.0.1:3306)/new-api?parseTime=true"
+			dsn = "root:123456@tcp(127.0.0.1:3306)/newapi?parseTime=true"
 			common.SysLog("SQL_DSN set to local, defaulting to MySQL")
 		}
 		// Use MySQL
@@ -161,7 +161,7 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, error) {
 		})
 	}
 	// Default to MySQL if no DSN provided
-	dsn = "root:123456@tcp(127.0.0.1:3306)/new-api?parseTime=true"
+	dsn = "root:123456@tcp(127.0.0.1:3306)/newapi?parseTime=true"
 	common.SysLog("SQL_DSN not set, defaulting to MySQL database")
 	common.UsingMySQL = true
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{
